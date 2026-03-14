@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OIDC Code Delivery Methods</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f4ef;
+    --color-background-tertiary: #eeede8;
+    --color-background-info: #e6f1fb;
+    --color-text-primary: #1a1a18;
+    --color-text-secondary: #5f5e5a;
+    --color-text-info: #0c447c;
+    --color-border-tertiary: rgba(0,0,0,0.12);
+    --color-border-secondary: rgba(0,0,0,0.22);
+    --color-border-primary: rgba(0,0,0,0.32);
+    --color-border-info: #378add;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background-primary: #1e1e1c;
+      --color-background-secondary: #27271f;
+      --color-background-tertiary: #2e2e25;
+      --color-background-info: #0c2a45;
+      --color-text-primary: #e8e6dc;
+      --color-text-secondary: #9c9a92;
+      --color-text-info: #85b7eb;
+      --color-border-tertiary: rgba(255,255,255,0.1);
+      --color-border-secondary: rgba(255,255,255,0.18);
+      --color-border-primary: rgba(255,255,255,0.28);
+      --color-border-info: #185fa5;
+    }
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    padding: 2rem;
+    max-width: 760px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-bottom: 1.5rem;
+  }
+
+  .method-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .method-btn {
+    cursor: pointer;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 10px 14px;
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+    font-family: var(--font-sans);
+  }
+
+  .method-btn:hover { background: var(--color-background-tertiary); }
+
+  .method-btn.active {
+    border-color: var(--color-border-info);
+    background: var(--color-background-info);
+    color: var(--color-text-info);
+  }
+
+  .method-btn .btn-sub {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .method-btn.active .btn-sub { color: var(--color-text-info); opacity: 0.8; }
+
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin: 2px;
+  }
+
+  .pill-ok  { background: #EAF3DE; color: #3B6D11; }
+  .pill-warn { background: #FAEEDA; color: #633806; }
+  .pill-bad  { background: #FCEBEB; color: #791F1F; }
+  .pill-info { background: #E6F1FB; color: #0C447C; }
+
+  @media (prefers-color-scheme: dark) {
+    .pill-ok  { background: #173404; color: #C0DD97; }
+    .pill-warn { background: #412402; color: #FAC775; }
+    .pill-bad  { background: #501313; color: #F7C1C1; }
+    .pill-info { background: #042C53; color: #85B7EB; }
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0;
+    flex-wrap: wrap;
+  }
+
+  .flow-box {
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .flow-spa     { background: #EEEDFE; color: #3C3489; }
+  .flow-browser { background: #E1F5EE; color: #085041; }
+  .flow-idp     { background: #FAECE7; color: #712B13; }
+
+  @media (prefers-color-scheme: dark) {
+    .flow-spa     { background: #26215C; color: #CECBF6; }
+    .flow-browser { background: #04342C; color: #9FE1CB; }
+    .flow-idp     { background: #4A1B0C; color: #F5C4B3; }
+  }
+
+  .flow-arrow { color: var(--color-text-secondary); font-size: 12px; }
+
+  .detail-panel {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    background: var(--color-background-secondary);
+    margin-top: 1rem;
+    min-height: 220px;
+  }
+
+  .detail-title {
+    font-weight: 500;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+
+  .detail-subtitle {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 12px;
+  }
+
+  .pills-row { margin-bottom: 10px; }
+
+  .detail-note {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    border-top: 0.5px solid var(--color-border-tertiary);
+    padding-top: 10px;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<h1>OIDC code delivery methods</h1>
+<p class="subtitle">How the auth code crosses the origin boundary from IdP back to your app — four approaches compared.</p>
+
+<div class="method-grid">
+  <button class="method-btn active" onclick="select('query')" id="btn-query">
+    Query param redirect
+    <span class="btn-sub">?code=X in URL</span>
+  </button>
+  <button class="method-btn" onclick="select('fragment')" id="btn-fragment">
+    Fragment redirect
+    <span class="btn-sub">#code=X — never sent to server</span>
+  </button>
+  <button class="method-btn" onclick="select('formpost')" id="btn-formpost">
+    Form POST
+    <span class="btn-sub">code in POST body</span>
+  </button>
+  <button class="method-btn" onclick="select('popup')" id="btn-popup">
+    Popup + postMessage
+    <span class="btn-sub">code stays off main URL</span>
+  </button>
+</div>
+
+<div class="detail-panel" id="detail"></div>
+
+<script>
+const methods = {
+  query: {
+    title: "Query param redirect",
+    subtitle: "The default. OIDC spec baseline.",
+    flow: [
+      [{t:"SPA",c:"flow-spa"}, "→ redirects browser →", {t:"IdP login",c:"flow-idp"}],
+      [{t:"IdP",c:"flow-idp"}, "→ 302 Location: app?code=X →", {t:"Browser",c:"flow-browser"}],
+      [{t:"Browser",c:"flow-browser"}, "→ GET app?code=X →", {t:"SPA",c:"flow-spa"}],
+      [{t:"SPA",c:"flow-spa"}, "→ POST /token (code + verifier) →", {t:"IdP",c:"flow-idp"}],
+    ],
+    pills: [
+      {t:"Works everywhere", cls:"pill-ok"},
+      {t:"No backend needed", cls:"pill-ok"},
+      {t:"Code in browser history", cls:"pill-warn"},
+      {t:"Code in server access logs", cls:"pill-warn"},
+      {t:"Code in Referer headers", cls:"pill-warn"},
+      {t:"PKCE makes code useless alone", cls:"pill-info"},
+    ],
+    note: "The code in the URL is short-lived (usually 60s) and single-use — and without the code_verifier it's worthless. PKCE converts a URL exposure from a token theft into a harmless log entry. Still, it's not elegant."
+  },
+  fragment: {
+    title: "Fragment redirect",
+    subtitle: "response_mode=fragment. Better URL privacy.",
+    flow: [
+      [{t:"SPA",c:"flow-spa"}, "→ redirects browser →", {t:"IdP login",c:"flow-idp"}],
+      [{t:"IdP",c:"flow-idp"}, "→ 302 Location: app#code=X →", {t:"Browser",c:"flow-browser"}],
+      [{t:"Browser",c:"flow-browser"}, "→ GET app (fragment NOT sent to server) →", {t:"SPA",c:"flow-spa"}],
+      [{t:"SPA",c:"flow-spa"}, "→ reads window.location.hash, POSTs to /token →", {t:"IdP",c:"flow-idp"}],
+    ],
+    pills: [
+      {t:"Code never reaches your server", cls:"pill-ok"},
+      {t:"No Referer leakage", cls:"pill-ok"},
+      {t:"No backend needed", cls:"pill-ok"},
+      {t:"Still in browser history", cls:"pill-warn"},
+      {t:"Widely supported", cls:"pill-info"},
+    ],
+    note: "The # fragment is never sent in HTTP requests — so your app server's access logs stay clean, and Referer headers strip it. Browser history still records it. This is a meaningful improvement over query params with no added complexity."
+  },
+  formpost: {
+    title: "Form POST (response_mode=form_post)",
+    subtitle: "Code travels in POST body — never in any URL.",
+    flow: [
+      [{t:"SPA",c:"flow-spa"}, "→ redirects browser →", {t:"IdP login",c:"flow-idp"}],
+      [{t:"IdP",c:"flow-idp"}, "→ renders hidden form, auto-submits →", {t:"Browser",c:"flow-browser"}],
+      [{t:"Browser",c:"flow-browser"}, "→ POST /callback  body: code=X →", {t:"App server",c:"flow-spa"}],
+      [{t:"App server",c:"flow-spa"}, "→ exchanges code, sets HttpOnly cookie →", {t:"SPA",c:"flow-spa"}],
+    ],
+    pills: [
+      {t:"Code never in any URL", cls:"pill-ok"},
+      {t:"No history exposure", cls:"pill-ok"},
+      {t:"No Referer leakage", cls:"pill-ok"},
+      {t:"Requires a backend (BFF)", cls:"pill-warn"},
+      {t:"Not a pure SPA pattern", cls:"pill-warn"},
+      {t:"Most private option", cls:"pill-ok"},
+    ],
+    note: "This is the most private delivery mechanism available today — the code is never in any URL at any point. The tradeoff: you need a server-side /callback endpoint to receive the POST. This is the Backend-for-Frontend (BFF) pattern. The BFF exchanges the code for tokens and sets an HttpOnly cookie, so tokens never touch JS at all."
+  },
+  popup: {
+    title: "Popup + postMessage",
+    subtitle: "Login in a child window, code passed via JS message.",
+    flow: [
+      [{t:"SPA",c:"flow-spa"}, "→ window.open(authURL) →", {t:"Popup window",c:"flow-browser"}],
+      [{t:"Popup",c:"flow-browser"}, "→ user logs in at IdP →", {t:"IdP",c:"flow-idp"}],
+      [{t:"IdP",c:"flow-idp"}, "→ 302 to popup callback URL →", {t:"Popup",c:"flow-browser"}],
+      [{t:"Popup",c:"flow-browser"}, "→ opener.postMessage(code) →", {t:"SPA",c:"flow-spa"}],
+      [{t:"SPA",c:"flow-spa"}, "→ popup.close(), POST /token →", {t:"IdP",c:"flow-idp"}],
+    ],
+    pills: [
+      {t:"Main page never navigates away", cls:"pill-ok"},
+      {t:"Code in popup URL, not main URL", cls:"pill-ok"},
+      {t:"No backend needed", cls:"pill-ok"},
+      {t:"Popup blockers break it", cls:"pill-warn"},
+      {t:"postMessage origin must be validated", cls:"pill-warn"},
+      {t:"Silent auth / SSO friendly", cls:"pill-info"},
+    ],
+    note: "The SPA stays alive in the main tab the whole time. The popup handles the redirect dance, then sends the code back via postMessage. The SPA must validate the message origin strictly — window.opener.postMessage from an unexpected origin is an injection vector. Auth libraries like Auth0.js, MSAL, and oidc-client use this pattern for silent token renewal."
+  }
+};
+
+function select(id) {
+  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + id).classList.add('active');
+  const m = methods[id];
+
+  let flowHtml = '';
+  m.flow.forEach(row => {
+    flowHtml += '<div class="flow-row">';
+    row.forEach(item => {
+      if (typeof item === 'string') {
+        flowHtml += `<span class="flow-arrow">${item}</span>`;
+      } else {
+        flowHtml += `<span class="flow-box ${item.c}">${item.t}</span>`;
+      }
+    });
+    flowHtml += '</div>';
+  });
+
+  let pillsHtml = m.pills.map(p => `<span class="pill ${p.cls}">${p.t}</span>`).join('');
+
+  document.getElementById('detail').innerHTML = `
+    <div class="detail-title">${m.title}</div>
+    <div class="detail-subtitle">${m.subtitle}</div>
+    <div>${flowHtml}</div>
+    <div class="pills-row">${pillsHtml}</div>
+    <div class="detail-note">${m.note}</div>
+  `;
+}
+
+select('query');
+</script>
+</body>
+</html>
