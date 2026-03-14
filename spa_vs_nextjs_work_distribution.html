@@ -1,0 +1,71 @@
+
+<style>
+* { box-sizing: border-box; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.col { border: 0.5px solid var(--color-border-tertiary); border-radius: 10px; overflow: hidden; }
+.col-head { padding: 10px 14px; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.col-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.col-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.col-body { padding: 10px 14px; }
+.zone { border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; }
+.z-browser { background: #E6F1FB; }
+.z-server { background: #EAF3DE; }
+.z-shared { background: #EEEDFE; }
+.zone-label { font-size: 10px; font-weight: 500; letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: 4px; }
+.zl-browser { color: #0C447C; }
+.zl-server { color: #3B6D11; }
+.zl-shared { color: #3C3489; }
+.zone-items { font-size: 11px; color: var(--color-text-secondary); line-height: 1.7; }
+@media (prefers-color-scheme: dark) {
+  .z-browser { background: #042C53; }
+  .z-server { background: #173404; }
+  .z-shared { background: #26215C; }
+  .zl-browser { color: #85B7EB; }
+  .zl-server { color: #C0DD97; }
+  .zl-shared { color: #CECBF6; }
+}
+</style>
+<div style="padding: 0.25rem 0">
+  <div class="cols">
+    <div class="col">
+      <div class="col-head">
+        <div class="col-title">Pure SPA</div>
+        <div class="col-sub">Server serves files only</div>
+      </div>
+      <div class="col-body">
+        <div class="zone z-browser">
+          <div class="zone-label zl-browser">Browser does everything</div>
+          <div class="zone-items">
+            Routing<br>Data fetching<br>Rendering<br>Auth logic<br>Business logic<br>Token storage<br>API orchestration
+          </div>
+        </div>
+        <div class="zone z-server">
+          <div class="zone-label zl-server">Server does almost nothing</div>
+          <div class="zone-items">Serve index.html<br>Serve JS/CSS bundle</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="col-head">
+        <div class="col-title">Next.js</div>
+        <div class="col-sub">Work placed where it fits best</div>
+      </div>
+      <div class="col-body">
+        <div class="zone z-browser">
+          <div class="zone-label zl-browser">Browser handles</div>
+          <div class="zone-items">Interactivity<br>Client-side navigation<br>Local UI state<br>User events</div>
+        </div>
+        <div class="zone z-server">
+          <div class="zone-label zl-server">Server handles</div>
+          <div class="zone-items">
+            Data fetching<br>Auth &amp; secrets<br>Rendering HTML<br>API orchestration<br>Heavy computation<br>Access control
+          </div>
+        </div>
+        <div class="zone z-shared">
+          <div class="zone-label zl-shared">Shared</div>
+          <div class="zone-items">Routing, components</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
