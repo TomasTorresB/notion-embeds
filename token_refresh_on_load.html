@@ -1,0 +1,78 @@
+
+<style>
+* { box-sizing: border-box; }
+.step { display: flex; gap: 14px; margin-bottom: 10px; align-items: flex-start; }
+.step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; margin-top: 2px; }
+.step-body { flex: 1; }
+.step-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+.step-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+.connector { width: 2px; height: 10px; background: var(--color-border-tertiary); margin-left: 12px; margin-bottom: 0; }
+.badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+.badge-ok { background: #EAF3DE; color: #3B6D11; }
+.badge-warn { background: #FAEEDA; color: #633806; }
+.badge-silent { background: #EEEDFE; color: #3C3489; }
+@media (prefers-color-scheme: dark) {
+  .badge-ok { background: #173404; color: #C0DD97; }
+  .badge-warn { background: #412402; color: #FAC775; }
+  .badge-silent { background: #26215C; color: #CECBF6; }
+}
+.divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 14px 0; }
+.section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+</style>
+
+<div style="padding: 0.25rem 0">
+  <div class="section-label">On every page load / refresh</div>
+
+  <div class="step">
+    <div class="step-num" style="background:#EEEDFE;color:#3C3489">1</div>
+    <div class="step-body">
+      <div class="step-title">Check JS memory <span class="badge badge-warn">always empty after refresh</span></div>
+      <div class="step-desc">Access token is gone. This is expected — memory doesn't survive navigation. Move to next option.</div>
+    </div>
+  </div>
+  <div class="connector"></div>
+
+  <div class="step">
+    <div class="step-num" style="background:#EEEDFE;color:#3C3489">2</div>
+    <div class="step-body">
+      <div class="step-title">Check for refresh token <span class="badge badge-ok">survives refresh</span></div>
+      <div class="step-desc">Stored in an HttpOnly cookie on your app's own domain (set by your BFF), or in a service worker. If found, POST it to the IdP's token endpoint directly — get a new access token in the response body. No redirect, no visible UI. Load time: ~100–300ms.</div>
+    </div>
+  </div>
+  <div class="connector"></div>
+
+  <div class="step">
+    <div class="step-num" style="background:#EEEDFE;color:#3C3489">3</div>
+    <div class="step-body">
+      <div class="step-title">If no refresh token — try silent auth via IdP session <span class="badge badge-silent">invisible to user</span></div>
+      <div class="step-desc">Launch a hidden iframe (or background popup) pointing at the IdP with prompt=none. The IdP checks its own HttpOnly session cookie. If the user is still logged in at the IdP, it issues a new auth code silently — no password prompt. The SPA exchanges this for a fresh access token. The user sees nothing.</div>
+    </div>
+  </div>
+  <div class="connector"></div>
+
+  <div class="step">
+    <div class="step-num" style="background:#FAECE7;color:#712B13">4</div>
+    <div class="step-body">
+      <div class="step-title">If IdP session also expired — full login</div>
+      <div class="step-desc">Only now does the user see the login screen. This is what happens after a long absence (days/weeks), or when the user explicitly logs out, or when the IdP enforces a maximum session lifetime.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-label">Where each credential lives</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px">
+    <div style="border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Access token</div>
+      <div style="font-size:11px;color:var(--color-text-secondary);line-height:1.5">JS memory only<br>Lost on refresh<br>Short-lived by design</div>
+    </div>
+    <div style="border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Refresh token</div>
+      <div style="font-size:11px;color:var(--color-text-secondary);line-height:1.5">HttpOnly cookie<br>on your app domain<br>(set by BFF/server)</div>
+    </div>
+    <div style="border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">IdP session</div>
+      <div style="font-size:11px;color:var(--color-text-secondary);line-height:1.5">HttpOnly cookie<br>on IdP's domain<br>SPA cannot see it</div>
+    </div>
+  </div>
+</div>
